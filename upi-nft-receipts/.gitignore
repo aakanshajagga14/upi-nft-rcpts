@@ -1,0 +1,19 @@
+# dependencies
+node_modules/
+frontend/node_modules/
+
+# hardhat outputs
+cache/
+artifacts/
+typechain-types/
+
+# env + logs
+.env
+*.log
+
+# generated runtime files
+transaction.json
+metadata-ipfs.json
+frontend/src/contractAddress.json
+frontend/src/UPIReceipt.json
+frontend/dist/

@@ -1,0 +1,237 @@
+
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font-sans); background: var(--color-background-tertiary); }
+  .app { max-width: 680px; margin: 0 auto; padding: 1.5rem 1rem; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+  .logo { display: flex; align-items: center; gap: 8px; }
+  .logo-dot { width: 10px; height: 10px; border-radius: 50%; background: #627EEA; }
+  .logo-text { font-size: 15px; font-weight: 500; color: var(--color-text-primary); }
+  .wallet-pill { display: flex; align-items: center; gap: 6px; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: 20px; padding: 6px 14px; font-size: 12px; color: var(--color-text-secondary); cursor: pointer; }
+  .wallet-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 1.5rem; }
+  .stat { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); padding: 14px; }
+  .stat-label { font-size: 11px; color: var(--color-text-secondary); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.04em; }
+  .stat-value { font-size: 22px; font-weight: 500; color: var(--color-text-primary); }
+  .stat-sub { font-size: 11px; color: var(--color-text-secondary); margin-top: 2px; }
+  .section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .section-title { font-size: 13px; font-weight: 500; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.05em; }
+  .filter-row { display: flex; gap: 6px; }
+  .filter-btn { font-size: 12px; padding: 4px 12px; border-radius: 20px; border: 0.5px solid var(--color-border-tertiary); background: transparent; color: var(--color-text-secondary); cursor: pointer; }
+  .filter-btn.active { background: #627EEA; color: #fff; border-color: #627EEA; }
+  .receipt-list { display: flex; flex-direction: column; gap: 10px; }
+  .receipt-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; cursor: pointer; transition: border-color 0.15s; }
+  .receipt-card:hover { border-color: var(--color-border-secondary); }
+  .receipt-card.expanded { border-color: #627EEA; }
+  .receipt-top { display: flex; align-items: center; justify-content: space-between; }
+  .receipt-left { display: flex; align-items: center; gap: 12px; }
+  .cat-icon { width: 36px; height: 36px; border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .receipt-name { font-size: 14px; font-weight: 500; color: var(--color-text-primary); }
+  .receipt-meta { font-size: 12px; color: var(--color-text-secondary); margin-top: 2px; }
+  .receipt-right { text-align: right; }
+  .receipt-amount { font-size: 16px; font-weight: 500; color: var(--color-text-primary); }
+  .sbt-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 10px; color: #627EEA; background: #EEF1FF; border-radius: 20px; padding: 2px 8px; margin-top: 4px; }
+  .receipt-detail { margin-top: 1rem; padding-top: 1rem; border-top: 0.5px solid var(--color-border-tertiary); display: none; }
+  .receipt-card.expanded .receipt-detail { display: block; }
+  .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .detail-item { background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 12px; }
+  .detail-label { font-size: 10px; color: var(--color-text-secondary); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 3px; }
+  .detail-value { font-size: 12px; font-weight: 500; color: var(--color-text-primary); font-family: var(--font-mono); word-break: break-all; }
+  .detail-value.readable { font-family: var(--font-sans); }
+  .verify-row { display: flex; gap: 8px; }
+  .verify-btn { flex: 1; font-size: 12px; padding: 8px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); background: transparent; color: var(--color-text-secondary); cursor: pointer; }
+  .verify-btn.primary { background: #627EEA; color: #fff; border-color: #627EEA; }
+  .qr-box { width: 64px; height: 64px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .privacy-note { font-size: 10px; color: var(--color-text-secondary); margin-top: 10px; padding: 8px 10px; background: var(--color-background-secondary); border-radius: var(--border-radius-md); border-left: 2px solid #627EEA; }
+  .mint-bar { margin-top: 1.5rem; background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem 1.25rem; }
+  .mint-title { font-size: 13px; font-weight: 500; color: var(--color-text-primary); margin-bottom: 10px; }
+  .sim-form { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .sim-input { font-size: 12px; padding: 8px 10px; border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); background: var(--color-background-secondary); color: var(--color-text-primary); width: 100%; }
+  .sim-input:focus { outline: none; border-color: #627EEA; }
+  .mint-btn { grid-column: span 2; background: #627EEA; color: #fff; border: none; border-radius: var(--border-radius-md); padding: 10px; font-size: 13px; font-weight: 500; cursor: pointer; margin-top: 4px; }
+  .toast { position: fixed; bottom: 20px; right: 20px; background: #1B1B2F; color: #fff; font-size: 12px; padding: 10px 16px; border-radius: var(--border-radius-md); display: none; z-index: 99; }
+</style>
+
+<div class="app">
+  <div class="topbar">
+    <div class="logo">
+      <div class="logo-dot"></div>
+      <span class="logo-text">UPI NFT Receipts</span>
+    </div>
+    <div class="wallet-pill">
+      <div class="wallet-dot"></div>
+      <span>0xAa3f...9B2c</span>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <div class="stat-label">Total receipts</div>
+      <div class="stat-value" id="total-count">4</div>
+      <div class="stat-sub">Soulbound NFTs</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Total verified</div>
+      <div class="stat-value">₹9,450</div>
+      <div class="stat-sub">On-chain proof</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Network</div>
+      <div class="stat-value" style="font-size:14px; padding-top:4px;">Sepolia</div>
+      <div class="stat-sub">Ethereum testnet</div>
+    </div>
+  </div>
+
+  <div class="section-head">
+    <span class="section-title">Your receipts</span>
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="filterCat(this,'all')">All</button>
+      <button class="filter-btn" onclick="filterCat(this,'Rent')">Rent</button>
+      <button class="filter-btn" onclick="filterCat(this,'Food')">Food</button>
+      <button class="filter-btn" onclick="filterCat(this,'Medical')">Medical</button>
+    </div>
+  </div>
+
+  <div class="receipt-list" id="receipt-list"></div>
+
+  <div class="mint-bar">
+    <div class="mint-title">Simulate a UPI transaction</div>
+    <div class="sim-form">
+      <input class="sim-input" id="sim-sender" placeholder="Sender UPI (e.g. you@okaxis)" />
+      <input class="sim-input" id="sim-receiver" placeholder="Receiver UPI (e.g. merchant@upi)" />
+      <input class="sim-input" id="sim-amount" placeholder="Amount (₹)" type="number" />
+      <select class="sim-input" id="sim-cat">
+        <option>Rent</option>
+        <option>Food</option>
+        <option>Medical</option>
+        <option>Transport</option>
+        <option>Education</option>
+      </select>
+      <button class="mint-btn" onclick="mintReceipt()">Mint NFT receipt on Sepolia →</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const RECEIPTS = [
+  { id: 0, cat: 'Rent', icon: '🏠', bg: '#EEF1FF', name: 'Monthly rent', receiver: 'landlord@okicici', amount: 5000, date: 'Apr 1, 2026', utr: '1234****5678', tokenId: '#0', txHash: '0xabc1...def2', senderHash: 'e3b0c4...2a5f8', receiverHash: 'a87ff6...9d3c1', zkReady: true },
+  { id: 1, cat: 'Food', icon: '🍛', bg: '#FEF9EE', name: 'Swiggy order', receiver: 'swiggy@axisbank', amount: 320, date: 'Apr 15, 2026', utr: '2345****6789', tokenId: '#1', txHash: '0xbcd2...ef34', senderHash: 'e3b0c4...2a5f8', receiverHash: 'c4ca42...8e2b1', zkReady: true },
+  { id: 2, cat: 'Medical', icon: '💊', bg: '#F0FFF4', name: 'Apollo pharmacy', receiver: 'apollo@hdfcbank', amount: 780, date: 'Apr 20, 2026', utr: '3456****7890', tokenId: '#2', txHash: '0xcde3...f456', senderHash: 'e3b0c4...2a5f8', receiverHash: 'd1e8a0...3f9c2', zkReady: true },
+  { id: 3, cat: 'Food', icon: '☕', bg: '#FEF9EE', name: 'Blue Tokai coffee', receiver: 'bluetokai@paytm', amount: 350, date: 'Apr 25, 2026', utr: '4567****8901', tokenId: '#3', txHash: '0xdef4...5678', senderHash: 'e3b0c4...2a5f8', receiverHash: 'eccbc8...7a1d3', zkReady: true },
+];
+
+let allReceipts = [...RECEIPTS];
+let activeFilter = 'all';
+
+function sha256mock(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
+  return Math.abs(h).toString(16).padStart(8,'0') + 'c44...f91a';
+}
+
+function utrMock() {
+  return Math.floor(100000000000 + Math.random() * 900000000000).toString().slice(0,4) + '****' + Math.floor(1000+Math.random()*9000);
+}
+
+function renderReceipts(list) {
+  const el = document.getElementById('receipt-list');
+  el.innerHTML = list.length === 0
+    ? '<p style="font-size:13px;color:var(--color-text-secondary);text-align:center;padding:2rem 0;">No receipts found</p>'
+    : list.map(r => `
+    <div class="receipt-card" id="card-${r.id}" onclick="toggle(${r.id})">
+      <div class="receipt-top">
+        <div class="receipt-left">
+          <div class="cat-icon" style="background:${r.bg}">${r.icon}</div>
+          <div>
+            <div class="receipt-name">${r.name}</div>
+            <div class="receipt-meta">${r.date} &nbsp;·&nbsp; ${r.cat} &nbsp;·&nbsp; Token ${r.tokenId}</div>
+          </div>
+        </div>
+        <div class="receipt-right">
+          <div class="receipt-amount">₹${r.amount.toLocaleString()}</div>
+          <div class="sbt-badge">🔒 Soulbound</div>
+        </div>
+      </div>
+      <div class="receipt-detail">
+        <div class="detail-grid">
+          <div class="detail-item">
+            <div class="detail-label">UTR (masked)</div>
+            <div class="detail-value readable">${r.utr}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Tx hash</div>
+            <div class="detail-value">${r.txHash}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Sender hash (SHA-256)</div>
+            <div class="detail-value">${r.senderHash}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-label">Receiver hash (SHA-256)</div>
+            <div class="detail-value">${r.receiverHash}</div>
+          </div>
+        </div>
+        <div class="privacy-note">
+          Sender &amp; receiver UPI IDs are SHA-256 hashed. Amount + timestamp stored as-is.
+          Zero-knowledge selective disclosure planned for v2.
+        </div>
+        <div class="verify-row" style="margin-top:10px;">
+          <button class="verify-btn primary" onclick="event.stopPropagation();showToast('Opening Sepolia Etherscan...')">View on Etherscan ↗</button>
+          <button class="verify-btn" onclick="event.stopPropagation();showToast('QR code link copied!')">Copy QR link</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function toggle(id) {
+  const card = document.getElementById('card-' + id);
+  card.classList.toggle('expanded');
+}
+
+function filterCat(btn, cat) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeFilter = cat;
+  const filtered = cat === 'all' ? allReceipts : allReceipts.filter(r => r.cat === cat);
+  renderReceipts(filtered);
+}
+
+function mintReceipt() {
+  const sender = document.getElementById('sim-sender').value || 'you@okaxis';
+  const receiver = document.getElementById('sim-receiver').value || 'merchant@upi';
+  const amount = parseInt(document.getElementById('sim-amount').value) || 100;
+  const cat = document.getElementById('sim-cat').value;
+  const icons = { Rent:'🏠', Food:'🍛', Medical:'💊', Transport:'🚌', Education:'📚' };
+  const bgs = { Rent:'#EEF1FF', Food:'#FEF9EE', Medical:'#F0FFF4', Transport:'#F0F9FF', Education:'#FFF7ED' };
+  const newId = allReceipts.length;
+  const newReceipt = {
+    id: newId, cat, icon: icons[cat]||'📄', bg: bgs[cat]||'#F9F9F9',
+    name: receiver.split('@')[0] + ' payment',
+    receiver, amount,
+    date: new Date().toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}),
+    utr: utrMock(), tokenId: '#' + newId,
+    txHash: '0x' + Math.random().toString(16).slice(2,6) + '...simulated',
+    senderHash: sha256mock(sender),
+    receiverHash: sha256mock(receiver),
+    zkReady: true,
+  };
+  allReceipts.unshift(newReceipt);
+  document.getElementById('total-count').textContent = allReceipts.length;
+  filterCat(document.querySelector('.filter-btn.active'), activeFilter);
+  showToast('Receipt minted! Token #' + newId + ' added to wallet.');
+  document.getElementById('sim-sender').value = '';
+  document.getElementById('sim-receiver').value = '';
+  document.getElementById('sim-amount').value = '';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => t.style.display = 'none', 2500);
+}
+
+renderReceipts(allReceipts);
+</script>

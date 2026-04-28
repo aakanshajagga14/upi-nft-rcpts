@@ -1,0 +1,805 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UPI NFT Receipts - Prototype Demo</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@300;400;500&display=swap");
+
+      :root {
+        --bg-page: #0f1117;
+        --bg-card: #161b27;
+        --bg-input: #1e2535;
+        --glass: rgba(255, 255, 255, 0.04);
+        --line: rgba(255, 255, 255, 0.07);
+        --line-active: rgba(99, 126, 234, 0.4);
+        --accent: #627eea;
+        --ok: #22c55e;
+        --text: #f1f5f9;
+        --text-sub: #8b9cb6;
+        --text-muted: #4a5568;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        font-family: "DM Sans", system-ui, sans-serif;
+        color: var(--text);
+        background:
+          radial-gradient(circle at 1px 1px, rgba(255, 255, 255, 0.03) 1px, transparent 0) 0 0/18px 18px,
+          var(--bg-page);
+        min-height: 100vh;
+      }
+
+      ::-webkit-scrollbar {
+        width: 7px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #0b0e14;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--accent);
+        border-radius: 8px;
+      }
+
+      .banner {
+        width: 100%;
+        background: rgba(99, 126, 234, 0.15);
+        border-bottom: 1px solid var(--line-active);
+        color: #dbe4ff;
+        text-align: center;
+        font-size: 0.86rem;
+        padding: 10px 14px;
+      }
+
+      .wrap {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 16px 20px 36px;
+      }
+
+      .topbar {
+        margin-top: 12px;
+        background: var(--glass);
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 500;
+      }
+
+      .diamond {
+        color: var(--accent);
+        font-size: 1rem;
+      }
+
+      .wallet-pill {
+        border-radius: 20px;
+        background: #111624;
+        border: 1px solid var(--line);
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-family: "DM Mono", ui-monospace, monospace;
+        font-size: 0.8rem;
+        color: #b7c4de;
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--ok);
+        animation: pulse 1.7s infinite;
+      }
+
+      .wallet-btn {
+        border-radius: 20px;
+        border: 1px solid var(--line-active);
+        background: rgba(99, 126, 234, 0.1);
+        color: #d8e2ff;
+        font-weight: 500;
+        cursor: pointer;
+        padding: 8px 14px;
+        transition: all 0.2s ease;
+      }
+
+      .wallet-btn:hover {
+        background: var(--accent);
+        color: #fff;
+      }
+
+      .title {
+        margin: 22px 0 14px;
+        font-size: 1.3rem;
+        letter-spacing: 0.01em;
+      }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .stat {
+        background: var(--glass);
+        backdrop-filter: blur(8px);
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--accent);
+        padding: 14px;
+        border-radius: 12px;
+        animation: fadeUp 0.4s both;
+      }
+
+      .meta {
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+        font-size: 0.69rem;
+        font-weight: 300;
+      }
+
+      .stat-value {
+        margin-top: 8px;
+        font-size: 1.35rem;
+        font-weight: 500;
+      }
+
+      .toolbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        margin: 20px 0 12px;
+      }
+
+      .filters {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .filter {
+        border-radius: 20px;
+        border: 1px solid var(--line);
+        background: #111624;
+        color: var(--text-sub);
+        padding: 7px 12px;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .filter.active {
+        background: var(--accent);
+        color: #fff;
+        border-color: var(--accent);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 12px;
+      }
+
+      .receipt {
+        background: var(--glass);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        padding: 14px;
+        transition: all 0.2s ease;
+        animation: fadeUp 0.42s both;
+      }
+
+      .receipt:hover {
+        border-color: rgba(99, 126, 234, 0.5);
+        transform: translateY(-1px);
+        background: rgba(255, 255, 255, 0.055);
+      }
+
+      .flash {
+        animation: mintFlash 0.6s ease;
+      }
+
+      .head {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .left-head {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        color: #fff;
+        font-size: 0.85rem;
+      }
+
+      .icon.food { background: #ec489933; }
+      .icon.shopping { background: #8b5cf633; }
+      .icon.transport { background: #3b82f633; }
+      .icon.default { background: #64748b33; }
+
+      .cat {
+        font-size: 0.88rem;
+        font-weight: 500;
+      }
+
+      .subcat {
+        color: var(--text-sub);
+        font-size: 0.75rem;
+        font-weight: 300;
+      }
+
+      .amount {
+        text-align: right;
+        font-size: 1.36rem;
+        font-weight: 500;
+      }
+
+      .badge {
+        margin-top: 11px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.72rem;
+        color: var(--accent);
+        background: #0f1522;
+        border: 1px solid var(--line-active);
+        border-radius: 20px;
+        padding: 6px 10px;
+      }
+
+      .badge svg {
+        width: 12px;
+        height: 12px;
+      }
+
+      .details {
+        margin-top: 12px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .chip {
+        background: #111624;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 8px;
+      }
+
+      .chip .label {
+        font-size: 0.65rem;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        letter-spacing: 0.06em;
+        margin-bottom: 4px;
+      }
+
+      .mono {
+        font-family: "DM Mono", ui-monospace, monospace;
+        color: #c7d4f1;
+        font-size: 0.74rem;
+        word-break: break-all;
+      }
+
+      .privacy {
+        margin-top: 10px;
+        border-left: 3px solid var(--accent);
+        background: #111624;
+        color: var(--text-sub);
+        font-size: 0.76rem;
+        padding: 8px 10px;
+        border-radius: 8px;
+        font-style: italic;
+      }
+
+      .actions {
+        margin-top: 12px;
+        display: flex;
+        gap: 8px;
+      }
+
+      .btn {
+        border-radius: 20px;
+        border: 1px solid transparent;
+        padding: 8px 12px;
+        font-size: 0.78rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .btn.primary {
+        background: var(--accent);
+        color: #fff;
+      }
+
+      .btn.primary:hover {
+        box-shadow: 0 0 12px rgba(99, 126, 234, 0.4);
+      }
+
+      .btn.ghost {
+        background: transparent;
+        color: var(--accent);
+        border-color: var(--line-active);
+      }
+
+      .sim-card {
+        margin-top: 18px;
+        background: var(--glass);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        padding: 14px;
+      }
+
+      .sim-title {
+        margin: 0 0 12px;
+        font-size: 1rem;
+        font-weight: 500;
+      }
+
+      .form-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .field label {
+        color: var(--text-sub);
+        font-size: 0.75rem;
+      }
+
+      .field input,
+      .field select {
+        width: 100%;
+        border-radius: 8px;
+        border: 1px solid var(--line);
+        background: var(--bg-input);
+        color: var(--text);
+        padding: 9px 10px;
+        font-family: "DM Sans", sans-serif;
+        outline: none;
+        transition: all 0.2s ease;
+      }
+
+      .field input:focus,
+      .field select:focus {
+        border-color: var(--line-active);
+        box-shadow: 0 0 0 2px rgba(99, 126, 234, 0.15);
+      }
+
+      .mint-btn {
+        margin-top: 12px;
+        width: 100%;
+        border: 0;
+        border-radius: 10px;
+        background: var(--accent);
+        color: #fff;
+        padding: 11px;
+        font-weight: 500;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.2s ease;
+      }
+
+      .mint-btn:hover {
+        transform: scale(1.01);
+        box-shadow: 0 0 14px rgba(99, 126, 234, 0.45);
+      }
+
+      .mint-btn::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -140%;
+        width: 90%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        transition: left 0.45s ease;
+      }
+
+      .mint-btn:hover::after {
+        left: 160%;
+      }
+
+      .toast {
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%) translateY(22px);
+        bottom: 18px;
+        background: #111624;
+        color: #d4e0ff;
+        border: 1px solid var(--line-active);
+        border-radius: 20px;
+        padding: 10px 14px;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.2s ease;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+      }
+
+      @keyframes fadeUp {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.4); opacity: 0.5; }
+      }
+
+      @keyframes mintFlash {
+        0% { border-color: var(--line); }
+        45% { border-color: rgba(99, 126, 234, 0.9); }
+        100% { border-color: var(--line); }
+      }
+
+      @media (max-width: 920px) {
+        .stats, .form-grid { grid-template-columns: 1fr; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="banner">Prototype Demo — Sepolia testnet integration in progress</div>
+
+    <div class="wrap">
+      <div class="topbar">
+        <div class="logo"><span class="diamond">◆</span><span>UPI Receipts</span></div>
+        <div id="walletSlot">
+          <button class="wallet-btn" id="connectBtn">Connect Wallet</button>
+        </div>
+      </div>
+
+      <h1 class="title">UPI NFT Receipts Dashboard</h1>
+
+      <section class="stats">
+        <article class="stat" style="animation-delay:.05s">
+          <div class="meta">total receipts</div>
+          <div class="stat-value" id="totalReceipts">0</div>
+        </article>
+        <article class="stat" style="animation-delay:.1s">
+          <div class="meta">total amount (inr)</div>
+          <div class="stat-value" id="totalAmount">₹0</div>
+        </article>
+        <article class="stat" style="animation-delay:.15s">
+          <div class="meta">soulbound status</div>
+          <div class="stat-value">Locked</div>
+        </article>
+      </section>
+
+      <section class="toolbar">
+        <div class="filters" id="filters"></div>
+        <div class="meta">Sepolia Receipt Vault</div>
+      </section>
+
+      <section class="grid" id="receiptGrid"></section>
+
+      <section class="sim-card">
+        <h2 class="sim-title">Simulate UPI transaction</h2>
+        <div class="form-grid">
+          <div class="field">
+            <label for="sender">Sender UPI ID</label>
+            <input id="sender" value="alice@upi" />
+          </div>
+          <div class="field">
+            <label for="receiver">Receiver UPI ID</label>
+            <input id="receiver" value="merchant@upi" />
+          </div>
+          <div class="field">
+            <label for="amount">Amount</label>
+            <input id="amount" type="number" min="1" value="1299" />
+          </div>
+          <div class="field">
+            <label for="category">Category</label>
+            <select id="category">
+              <option>Food</option>
+              <option selected>Shopping</option>
+              <option>Transport</option>
+              <option>Bills</option>
+            </select>
+          </div>
+        </div>
+        <button class="mint-btn" id="mintBtn">Mint Soulbound Receipt</button>
+      </section>
+    </div>
+
+    <div class="toast" id="toast"></div>
+
+    <script>
+      const state = {
+        wallet: "",
+        activeFilter: "All",
+        receipts: [
+          {
+            tokenId: 41,
+            category: "Shopping",
+            amount: 1299,
+            senderHash: "bc0cd8fb49aa20bb2a3bec4a4ba8e0b3ff30229d51ddbf59c448b837f9cb92d6",
+            receiverHash: "bf6cb2d6eaaf170d2f42531482221e9e79373d88047da739708e56dadadebff9",
+            utrHash: "4a7d962b27e1640a7395edbcec642837564a36f2300b10dc979bbe601a839627",
+            timestamp: Math.floor(Date.now() / 1000) - 3600,
+          },
+          {
+            tokenId: 40,
+            category: "Food",
+            amount: 480,
+            senderHash: "ac0cd8fb49aa20bb2a3bec4a4ba8e0b3ff30229d51ddbf59c448b837f9cb92a1",
+            receiverHash: "cf6cb2d6eaaf170d2f42531482221e9e79373d88047da739708e56dadade1111",
+            utrHash: "1a7d962b27e1640a7395edbcec642837564a36f2300b10dc979bbe601a83777f",
+            timestamp: Math.floor(Date.now() / 1000) - 9800,
+          },
+          {
+            tokenId: 39,
+            category: "Transport",
+            amount: 210,
+            senderHash: "dc0cd8fb49aa20bb2a3bec4a4ba8e0b3ff30229d51ddbf59c448b837f9cb9fff",
+            receiverHash: "ef6cb2d6eaaf170d2f42531482221e9e79373d88047da739708e56dadadeabcd",
+            utrHash: "9a7d962b27e1640a7395edbcec642837564a36f2300b10dc979bbe601a830055",
+            timestamp: Math.floor(Date.now() / 1000) - 18200,
+          },
+        ],
+      };
+
+      const filters = ["All", "Food", "Shopping", "Transport", "Bills"];
+
+      const walletSlot = document.getElementById("walletSlot");
+      const filtersNode = document.getElementById("filters");
+      const receiptGrid = document.getElementById("receiptGrid");
+      const totalReceipts = document.getElementById("totalReceipts");
+      const totalAmount = document.getElementById("totalAmount");
+      const toast = document.getElementById("toast");
+
+      function truncateAddress(address) {
+        return address.slice(0, 6) + "..." + address.slice(-4);
+      }
+
+      function hashMask(v) {
+        return v.slice(0, 6) + "..." + v.slice(-6);
+      }
+
+      function hashHex(input) {
+        const bytes = new TextEncoder().encode(input);
+        return crypto.subtle.digest("SHA-256", bytes).then((buf) =>
+          Array.from(new Uint8Array(buf)).map((b) => b.toString(16).padStart(2, "0")).join("")
+        );
+      }
+
+      function formatTime(ts) {
+        return new Date(ts * 1000).toLocaleString("en-IN", {
+          day: "2-digit",
+          month: "short",
+          hour: "2-digit",
+          minute: "2-digit",
+          year: "numeric",
+          hour12: false,
+          timeZone: "Asia/Kolkata",
+        }) + " IST";
+      }
+
+      function iconFor(category) {
+        const c = category.toLowerCase();
+        if (c === "food") return { cls: "food", emoji: "🍽" };
+        if (c === "shopping") return { cls: "shopping", emoji: "🛍" };
+        if (c === "transport") return { cls: "transport", emoji: "🚕" };
+        return { cls: "default", emoji: "◎" };
+      }
+
+      function showToast(msg) {
+        toast.textContent = msg;
+        toast.classList.add("show");
+        window.clearTimeout(showToast._t);
+        showToast._t = window.setTimeout(() => toast.classList.remove("show"), 1800);
+      }
+
+      function renderWallet() {
+        if (!state.wallet) {
+          walletSlot.innerHTML = '<button class="wallet-btn" id="connectBtn">Connect Wallet</button>';
+          document.getElementById("connectBtn").onclick = connectWallet;
+          return;
+        }
+        walletSlot.innerHTML = `
+          <div class="wallet-pill">
+            <span class="dot"></span>
+            <span>${truncateAddress(state.wallet)}</span>
+          </div>
+        `;
+      }
+
+      function renderFilters() {
+        filtersNode.innerHTML = filters
+          .map(
+            (f) =>
+              `<button class="filter ${state.activeFilter === f ? "active" : ""}" data-filter="${f}">${f}</button>`
+          )
+          .join("");
+        filtersNode.querySelectorAll(".filter").forEach((btn) => {
+          btn.onclick = () => {
+            state.activeFilter = btn.dataset.filter;
+            render();
+          };
+        });
+      }
+
+      function renderStats() {
+        const visible = getVisibleReceipts();
+        const amount = visible.reduce((sum, r) => sum + Number(r.amount), 0);
+        totalReceipts.textContent = visible.length;
+        totalAmount.textContent = "₹" + amount.toLocaleString("en-IN");
+      }
+
+      function getVisibleReceipts() {
+        if (state.activeFilter === "All") return state.receipts;
+        return state.receipts.filter((r) => r.category === state.activeFilter);
+      }
+
+      function receiptCard(r, idx) {
+        const icon = iconFor(r.category);
+        const url = `https://sepolia.etherscan.io/token/0xContractAddressPlaceholder?a=${r.tokenId}`;
+        return `
+          <article class="receipt ${r._new ? "flash" : ""}" style="animation-delay:${idx * 0.05}s">
+            <div class="head">
+              <div class="left-head">
+                <div class="icon ${icon.cls}">${icon.emoji}</div>
+                <div>
+                  <div class="cat">${r.category}</div>
+                  <div class="subcat">Token #${String(r.tokenId).padStart(4, "0")}</div>
+                </div>
+              </div>
+              <div class="amount">₹${Number(r.amount).toLocaleString("en-IN")}</div>
+            </div>
+
+            <div class="badge">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="5" y="11" width="14" height="10" rx="2"></rect>
+                <path d="M8 11V8a4 4 0 118 0v3"></path>
+              </svg>
+              Soulbound
+            </div>
+
+            <div class="details">
+              <div class="chip">
+                <div class="label">UTR Hash</div>
+                <div class="mono">${hashMask(r.utrHash)}</div>
+              </div>
+              <div class="chip">
+                <div class="label">Timestamp</div>
+                <div class="mono">${formatTime(r.timestamp)}</div>
+              </div>
+              <div class="chip">
+                <div class="label">Sender Hash</div>
+                <div class="mono">${hashMask(r.senderHash)}</div>
+              </div>
+              <div class="chip">
+                <div class="label">Receiver Hash</div>
+                <div class="mono">${hashMask(r.receiverHash)}</div>
+              </div>
+            </div>
+
+            <div class="privacy">Amount and timestamp are stored as plaintext in this prototype. ZK selective disclosure is planned.</div>
+
+            <div class="actions">
+              <a class="btn primary" href="${url}" target="_blank" rel="noopener noreferrer">View on Etherscan</a>
+              <button class="btn ghost" data-copy="${r.utrHash}">Copy QR</button>
+            </div>
+          </article>
+        `;
+      }
+
+      function renderReceipts() {
+        const visible = getVisibleReceipts();
+        if (!visible.length) {
+          receiptGrid.innerHTML = '<div class="meta">No receipts found for this filter.</div>';
+          return;
+        }
+        receiptGrid.innerHTML = visible.map((r, i) => receiptCard(r, i)).join("");
+        receiptGrid.querySelectorAll("[data-copy]").forEach((btn) => {
+          btn.onclick = async () => {
+            await navigator.clipboard.writeText(btn.dataset.copy);
+            showToast("Hash copied");
+          };
+        });
+      }
+
+      async function connectWallet() {
+        try {
+          if (window.ethereum) {
+            const accounts = await window.ethereum.request({ method: "eth_requestAccounts" });
+            state.wallet = accounts[0] || "";
+          } else {
+            state.wallet = "0x48073bf403Aa79ac25347BbAF88a6AA6Df33eA15";
+          }
+          renderWallet();
+          showToast("Wallet connected");
+        } catch {
+          showToast("Wallet connection failed");
+        }
+      }
+
+      async function handleMint() {
+        const sender = document.getElementById("sender").value.trim();
+        const receiver = document.getElementById("receiver").value.trim();
+        const amount = Number(document.getElementById("amount").value);
+        const category = document.getElementById("category").value;
+        if (!sender || !receiver || !amount) {
+          showToast("Fill all transaction fields");
+          return;
+        }
+
+        const now = Math.floor(Date.now() / 1000);
+        const utrRaw = String(Math.floor(Math.random() * 9e11 + 1e11));
+        const [senderHash, receiverHash, utrHash] = await Promise.all([
+          hashHex(sender),
+          hashHex(receiver),
+          hashHex(utrRaw),
+        ]);
+
+        const nextToken = state.receipts.length ? Math.max(...state.receipts.map((r) => r.tokenId)) + 1 : 1;
+        state.receipts.unshift({
+          tokenId: nextToken,
+          category,
+          amount,
+          senderHash,
+          receiverHash,
+          utrHash,
+          timestamp: now,
+          _new: true,
+        });
+        render();
+        showToast("Soulbound receipt minted");
+        setTimeout(() => {
+          state.receipts.forEach((r) => delete r._new);
+          renderReceipts();
+        }, 700);
+      }
+
+      function render() {
+        renderWallet();
+        renderFilters();
+        renderStats();
+        renderReceipts();
+      }
+
+      document.getElementById("mintBtn").onclick = handleMint;
+      render();
+    </script>
+  </body>
+</html>

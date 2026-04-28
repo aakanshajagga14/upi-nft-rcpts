@@ -1,0 +1,21 @@
+{
+  "name": "upi-nft-receipts",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Middleware proof layer for simulated UPI receipts as Soulbound NFTs",
+  "scripts": {
+    "compile": "hardhat compile",
+    "deploy:sepolia": "hardhat run scripts/deploy.js --network sepolia",
+    "copyabi": "node scripts/copyABI.js",
+    "mint": "node scripts/mint.js"
+  },
+  "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
+    "dotenv": "^16.4.5",
+    "hardhat": "^2.22.10"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.9.6",
+    "ethers": "^6.13.2"
+  }
+}
