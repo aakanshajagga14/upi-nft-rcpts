@@ -45,14 +45,6 @@ node scripts/mint.js
 cd frontend && npm install && npm run dev
 ```
 
-## Project structure
-├── contracts/UPIReceipt.sol    # Soulbound NFT smart contract
-├── scripts/deploy.js           # Deploy to Sepolia
-├── scripts/mint.js             # Mint a receipt
-├── simulator.py                # Simulate UPI transaction
-├── frontend/                   # React dashboard
-└── demo/index.html             # Standalone mockup demo
-
 ## Privacy
 
 Sender and receiver UPI IDs are SHA-256 hashed before being 
