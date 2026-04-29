@@ -79,5 +79,5 @@ cd frontend && npm install && npm run dev
 
 Submitted as part of the **Road to Devcon 8 India Ecosystem Program grant**.
 
-- Live demo: [TBD](https://example.com)
+- Live demo: (https://aakanshajagga14.github.io/upi-nft-rcpts/upi-nft-receipts/demo/)
 - arXiv paper: [TBD](https://arxiv.org)
