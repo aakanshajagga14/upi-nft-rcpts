@@ -10,7 +10,6 @@ def sha256_hex(value: str) -> str:
 def generate_utr() -> str:
     return "".join(str(random.randint(0, 9)) for _ in range(12))
 
-
 def main() -> None:
     sender_upi = "alice@upi"
     receiver_upi = "merchant@upi"
