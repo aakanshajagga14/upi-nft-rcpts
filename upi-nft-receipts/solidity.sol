@@ -125,3 +125,4 @@ contract UPIReceipt is ERC721, Ownable {
                super.supportsInterface(interfaceId);
     }
 }
+
